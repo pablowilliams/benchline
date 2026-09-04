@@ -1,0 +1,9 @@
+{
+  "requests": 20000,
+  "concurrency": 1,
+  "measured": "in-process deterministic serving path",
+  "p50_ms": 38.41,
+  "p95_ms": 42.81,
+  "p99_ms": 42.81,
+  "errors": 0
+}

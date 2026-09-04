@@ -1,0 +1,60 @@
+{
+  "title": "RankForge primary offline backtest",
+  "generated_on": "2026-09-04",
+  "methodology": {
+    "primary_metric": "NDCG@10",
+    "baseline": "contextual popularity",
+    "challenger": "hybrid affinity + quality + policy rerank",
+    "bootstrap": {
+      "resamples": 1000,
+      "unit": "user",
+      "absolute_delta": 0.06603730164036467,
+      "ci_95_low": 0.05944653466235707,
+      "ci_95_high": 0.07315865508155885
+    },
+    "claim_scope": "Synthetic learning marketplace; offline association, not causal uplift."
+  },
+  "dataset": {
+    "seed": 240926,
+    "users": 720,
+    "items": 120,
+    "train_events": 31680,
+    "test_positives": 2880,
+    "split": "temporal holdout",
+    "topics": [
+      "data-engineering",
+      "machine-learning",
+      "data-science",
+      "mlops",
+      "backend",
+      "product-analytics",
+      "security",
+      "systems"
+    ],
+    "manifest_sha256": "142b47ef31c74c1cc40bb51c923867b8cb14a79afaee1903501e04b5c0134846"
+  },
+  "baseline": {
+    "ndcg_at_10": 0.2443080871064626,
+    "recall_at_10": 0.2454861111111111,
+    "catalogue_coverage": 0.9833333333333333,
+    "topic_diversity": 0.125,
+    "creator_gini": 0.13583333333333325
+  },
+  "challenger": {
+    "ndcg_at_10": 0.31034538874682727,
+    "recall_at_10": 0.2520833333333333,
+    "catalogue_coverage": 1.0,
+    "topic_diversity": 0.12552083333333333,
+    "creator_gini": 0.09429398148148138
+  },
+  "headline": {
+    "ndcg_uplift_percent": 27.030337973047725,
+    "coverage_change_points": 1.6666666666666718,
+    "interval_excludes_zero": true
+  },
+  "runtime": {
+    "seconds": 6.621990291998372,
+    "python": "3.13.1",
+    "platform": "macOS-14.6-arm64-arm-64bit-Mach-O"
+  }
+}

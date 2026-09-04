@@ -1,0 +1,342 @@
+export type Course = {
+  id: string;
+  title: string;
+  topic: string;
+  level: string;
+  durationMinutes: number;
+  creator: string;
+  quality: number;
+  popularity: number;
+  freshness: number;
+  accent: string;
+};
+
+export type UserProfile = {
+  id: string;
+  name: string;
+  descriptor: string;
+  topics: Record<string, number>;
+  preferredLevel: string;
+  novelty: number;
+  completed: string[];
+};
+
+export const courses: Course[] = [
+  {
+    id: "crs_101",
+    title: "Designing Reliable Data Products",
+    topic: "Data engineering",
+    level: "Advanced",
+    durationMinutes: 85,
+    creator: "Mara Chen",
+    quality: 0.96,
+    popularity: 0.76,
+    freshness: 0.72,
+    accent: "#3559e8",
+  },
+  {
+    id: "crs_102",
+    title: "Practical Learning-to-Rank",
+    topic: "Machine learning",
+    level: "Advanced",
+    durationMinutes: 110,
+    creator: "Ishan Rao",
+    quality: 0.98,
+    popularity: 0.84,
+    freshness: 0.91,
+    accent: "#7c3aed",
+  },
+  {
+    id: "crs_103",
+    title: "Experiment Design Under Pressure",
+    topic: "Data science",
+    level: "Intermediate",
+    durationMinutes: 72,
+    creator: "Nora Feld",
+    quality: 0.94,
+    popularity: 0.68,
+    freshness: 0.77,
+    accent: "#0f766e",
+  },
+  {
+    id: "crs_104",
+    title: "Feature Stores Without the Hype",
+    topic: "MLOps",
+    level: "Advanced",
+    durationMinutes: 64,
+    creator: "Mara Chen",
+    quality: 0.92,
+    popularity: 0.63,
+    freshness: 0.88,
+    accent: "#b45309",
+  },
+  {
+    id: "crs_105",
+    title: "TypeScript Systems at Scale",
+    topic: "Backend",
+    level: "Advanced",
+    durationMinutes: 96,
+    creator: "Eli Grant",
+    quality: 0.93,
+    popularity: 0.79,
+    freshness: 0.66,
+    accent: "#0369a1",
+  },
+  {
+    id: "crs_106",
+    title: "Product Metrics That Survive Contact",
+    topic: "Product analytics",
+    level: "Intermediate",
+    durationMinutes: 58,
+    creator: "Nora Feld",
+    quality: 0.91,
+    popularity: 0.82,
+    freshness: 0.62,
+    accent: "#be123c",
+  },
+  {
+    id: "crs_107",
+    title: "Streaming Systems: The Failure Modes",
+    topic: "Data engineering",
+    level: "Advanced",
+    durationMinutes: 124,
+    creator: "Jo Alvarez",
+    quality: 0.97,
+    popularity: 0.71,
+    freshness: 0.94,
+    accent: "#4338ca",
+  },
+  {
+    id: "crs_108",
+    title: "Recommenders from First Principles",
+    topic: "Machine learning",
+    level: "Intermediate",
+    durationMinutes: 88,
+    creator: "Ishan Rao",
+    quality: 0.95,
+    popularity: 0.92,
+    freshness: 0.58,
+    accent: "#6d28d9",
+  },
+  {
+    id: "crs_109",
+    title: "Observability for Model Serving",
+    topic: "MLOps",
+    level: "Intermediate",
+    durationMinutes: 52,
+    creator: "Jo Alvarez",
+    quality: 0.9,
+    popularity: 0.67,
+    freshness: 0.84,
+    accent: "#047857",
+  },
+  {
+    id: "crs_110",
+    title: "Causal Inference for Product Teams",
+    topic: "Data science",
+    level: "Advanced",
+    durationMinutes: 118,
+    creator: "Sofia Bell",
+    quality: 0.97,
+    popularity: 0.74,
+    freshness: 0.69,
+    accent: "#9f1239",
+  },
+  {
+    id: "crs_111",
+    title: "API Contracts and Calm Migrations",
+    topic: "Backend",
+    level: "Intermediate",
+    durationMinutes: 62,
+    creator: "Eli Grant",
+    quality: 0.89,
+    popularity: 0.61,
+    freshness: 0.93,
+    accent: "#075985",
+  },
+  {
+    id: "crs_112",
+    title: "The Craft of Useful Dashboards",
+    topic: "Product analytics",
+    level: "Intermediate",
+    durationMinutes: 46,
+    creator: "Sofia Bell",
+    quality: 0.88,
+    popularity: 0.87,
+    freshness: 0.73,
+    accent: "#c2410c",
+  },
+];
+
+export const users: UserProfile[] = [
+  {
+    id: "usr_maya",
+    name: "Maya",
+    descriptor: "Senior data engineer",
+    topics: {
+      "Data engineering": 1,
+      MLOps: 0.82,
+      Backend: 0.61,
+      "Machine learning": 0.55,
+    },
+    preferredLevel: "Advanced",
+    novelty: 0.62,
+    completed: ["crs_104"],
+  },
+  {
+    id: "usr_leo",
+    name: "Leo",
+    descriptor: "Product data scientist",
+    topics: {
+      "Data science": 1,
+      "Product analytics": 0.92,
+      "Machine learning": 0.74,
+    },
+    preferredLevel: "Intermediate",
+    novelty: 0.45,
+    completed: ["crs_106"],
+  },
+  {
+    id: "usr_amina",
+    name: "Amina",
+    descriptor: "ML platform engineer",
+    topics: {
+      MLOps: 1,
+      "Machine learning": 0.95,
+      "Data engineering": 0.77,
+      Backend: 0.55,
+    },
+    preferredLevel: "Advanced",
+    novelty: 0.78,
+    completed: ["crs_108"],
+  },
+  {
+    id: "usr_new",
+    name: "New learner",
+    descriptor: "No behavioural history",
+    topics: {},
+    preferredLevel: "Intermediate",
+    novelty: 0.7,
+    completed: [],
+  },
+];
+
+export const experiments = [
+  {
+    id: "exp_0248",
+    name: "Hybrid LTR / policy v3",
+    status: "Ready for review",
+    owner: "P. Williams",
+    dataset: "temporal-2026-08",
+    model: "ranker-2.4.0",
+    ndcg: 0.3103,
+    delta: 27.0,
+    interval: "+24.3 to +29.9%",
+    coverage: 100,
+    latency: 42.8,
+  },
+  {
+    id: "exp_0241",
+    name: "Affinity features ablation",
+    status: "Completed",
+    owner: "P. Williams",
+    dataset: "temporal-2026-08",
+    model: "ranker-2.3.2",
+    ndcg: 0.289,
+    delta: 18.3,
+    interval: "+15.5 to +21.2%",
+    coverage: 99.2,
+    latency: 38.2,
+  },
+  {
+    id: "exp_0236",
+    name: "Contextual popularity",
+    status: "Baseline",
+    owner: "System",
+    dataset: "temporal-2026-08",
+    model: "popular-1.3.0",
+    ndcg: 0.2443,
+    delta: 0,
+    interval: "reference",
+    coverage: 98.3,
+    latency: 8.4,
+  },
+];
+
+export const models = [
+  {
+    version: "ranker-2.4.0",
+    alias: "challenger",
+    family: "LambdaMART",
+    status: "Gates passed",
+    trained: "2 Sep",
+    features: "learning-v7",
+    hash: "9a7c…31e2",
+  },
+  {
+    version: "ranker-2.3.2",
+    alias: "champion",
+    family: "Gradient boosted",
+    status: "Serving",
+    trained: "24 Aug",
+    features: "learning-v6",
+    hash: "57bd…c911",
+  },
+  {
+    version: "popular-1.3.0",
+    alias: "fallback",
+    family: "Decayed popularity",
+    status: "Serving fallback",
+    trained: "Hourly",
+    features: "catalog-v4",
+    hash: "16cc…78a0",
+  },
+];
+
+export const features = [
+  {
+    name: "user_topic_affinity_28d",
+    view: "user_learning",
+    freshness: "11 min",
+    health: "Healthy",
+    drift: 0.04,
+    nulls: 0,
+    owner: "Personalization",
+  },
+  {
+    name: "item_completion_quality_90d",
+    view: "item_quality",
+    freshness: "43 min",
+    health: "Healthy",
+    drift: 0.07,
+    nulls: 0.1,
+    owner: "Learning data",
+  },
+  {
+    name: "item_popularity_decay_7d",
+    view: "item_momentum",
+    freshness: "7 min",
+    health: "Healthy",
+    drift: 0.09,
+    nulls: 0,
+    owner: "Data platform",
+  },
+  {
+    name: "session_topic_intent",
+    view: "request_context",
+    freshness: "request",
+    health: "Healthy",
+    drift: 0.03,
+    nulls: 2.4,
+    owner: "Personalization",
+  },
+  {
+    name: "creator_exposure_24h",
+    view: "policy",
+    freshness: "18 min",
+    health: "Watching",
+    drift: 0.18,
+    nulls: 0.3,
+    owner: "Trust & quality",
+  },
+];

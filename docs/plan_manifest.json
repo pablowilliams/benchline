@@ -1,0 +1,24 @@
+{
+  "title": "RankForge",
+  "pages": 75,
+  "sha256": "4c467656cf600b28692d31cbdf0ad4aecf77ca6cee74c65c5c78db78d919f6c3",
+  "pdf": "output/pdf/RankForge_75_Page_Engineering_Plan.pdf",
+  "source": "docs/ENGINEERING_PLAN.md",
+  "section_counts": {
+    "Opening": 2,
+    "Strategy": 8,
+    "Architecture": 3,
+    "Data": 6,
+    "Models": 9,
+    "Contracts": 7,
+    "Security": 4,
+    "Experience": 11,
+    "Reliability": 5,
+    "Platform": 3,
+    "Quality": 2,
+    "Evaluation": 9,
+    "Delivery": 2,
+    "Roadmap": 3,
+    "Appendix": 1
+  }
+}
