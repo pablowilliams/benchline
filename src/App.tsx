@@ -248,6 +248,7 @@ function Sidebar({
               <button
                 key={item.id}
                 className={`nav-item ${page === item.id ? "active" : ""}`}
+                aria-current={page === item.id ? "page" : undefined}
                 onClick={() => {
                   setPage(item.id);
                   setOpen(false);
@@ -444,7 +445,7 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
             <Attention
               icon={CheckCircle2}
               tone="good"
-              title="Release gates passed"
+              title="Release checks passed"
               body="ranker-2.4.0 is ready for a controlled promotion."
               meta="4 min ago"
               onClick={() => setPage("registry")}
@@ -477,7 +478,7 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
             </div>
             <span className="score-ring">100</span>
           </div>
-          {["Ranking quality", "Catalogue coverage", "Serving latency", "Artifact integrity"].map((x) => (
+          {["Ranking quality", "Catalogue coverage", "Serving latency", "Source revision"].map((x) => (
             <div className="gate-row" key={x}>
               <Check size={14} />
               <span>{x}</span>
@@ -497,8 +498,8 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
         <article className="panel compact">
           <div className="panel-head">
             <div>
-              <span className="section-label">Recent decisions</span>
-              <h3>Operating history</h3>
+              <span className="section-label">Scenario history</span>
+              <h3>Seeded operating record</h3>
             </div>
           </div>
           <div className="timeline">
@@ -563,27 +564,25 @@ function QualityChart({
   challenger: number;
   users: number;
 }) {
-  const scale = (value: number) => ((value - 0.2) / 0.14) * 420;
+  const max = Math.max(champion, challenger);
   return (
-    <svg className="quality-chart" viewBox="0 0 700 150" role="img" aria-label="Measured NDCG comparison">
-      <text x="45" y="43">
-        Contextual popularity
-      </text>
-      <rect x="185" y="25" width={scale(champion)} height="25" rx="4" className="quality-baseline" />
-      <text x={195 + scale(champion)} y="43">
-        {champion.toFixed(4)}
-      </text>
-      <text x="45" y="98">
-        Hybrid scorer
-      </text>
-      <rect x="185" y="80" width={scale(challenger)} height="25" rx="4" className="quality-challenger" />
-      <text x={195 + scale(challenger)} y="98">
-        {challenger.toFixed(4)}
-      </text>
-      <text x="185" y="135">
-        Generated temporal holdout · {users} users
-      </text>
-    </svg>
+    <div className="quality-comparison" role="img" aria-label="Measured NDCG comparison">
+      <div className="quality-row">
+        <span>Contextual popularity</span>
+        <i>
+          <u className="baseline" style={{ width: `${(champion / max) * 100}%` }} />
+        </i>
+        <b>{champion.toFixed(4)}</b>
+      </div>
+      <div className="quality-row">
+        <span>Hybrid scorer</span>
+        <i>
+          <u className="challenger" style={{ width: `${(challenger / max) * 100}%` }} />
+        </i>
+        <b>{challenger.toFixed(4)}</b>
+      </div>
+      <small>Generated temporal holdout · {users} users</small>
+    </div>
   );
 }
 
@@ -1578,12 +1577,12 @@ function CommandPalette({
         </div>
         <div className="command-foot">
           <span>
-            <kbd>↑↓</kbd> move
+            <kbd>Esc</kbd> close
           </span>
           <span>
-            <kbd>↵</kbd> open
+            <kbd>⌘ K</kbd> open
           </span>
-          <span>Benchline command menu</span>
+          <span>Benchline navigation</span>
         </div>
       </div>
     </div>
