@@ -24,16 +24,6 @@
   --red: #b33b36;
   --sidebar: #191d21;
 }
-.quality-baseline {
-  fill: #98a1ad;
-}
-.quality-challenger {
-  fill: var(--blue);
-}
-.quality-chart text {
-  fill: var(--muted);
-  font-size: 12px;
-}
 .quiet-label {
   color: var(--muted);
   font-size: 12px;
@@ -60,6 +50,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: var(--paper);
+  font-variant-numeric: tabular-nums;
 }
 button,
 input,
@@ -565,10 +556,48 @@ main {
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
-.quality-chart {
-  width: 100%;
-  height: 184px;
+.quality-comparison {
+  min-height: 184px;
   margin-top: 9px;
+  padding: 28px 8px 18px;
+  display: grid;
+  align-content: center;
+  gap: 22px;
+}
+.quality-row {
+  display: grid;
+  grid-template-columns: 128px minmax(120px, 1fr) 58px;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.quality-row i {
+  height: 22px;
+  border-radius: 5px;
+  background: #eeece6;
+  overflow: hidden;
+}
+.quality-row u {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  text-decoration: none;
+}
+.quality-row .baseline {
+  background: #9da5b1;
+}
+.quality-row .challenger {
+  background: var(--blue);
+}
+.quality-row b {
+  color: var(--ink);
+  font-size: 12px;
+}
+.quality-comparison > small {
+  padding-left: 140px;
+  color: var(--muted);
+  font-size: 10px;
 }
 .grid line {
   stroke: #ece9e2;
@@ -2124,8 +2153,22 @@ main {
   .two-col.major {
     grid-template-columns: 1fr;
   }
-  .quality-chart {
-    height: 150px;
+  .quality-comparison {
+    min-height: 180px;
+    padding-inline: 0;
+  }
+  .quality-row {
+    grid-template-columns: 1fr 54px;
+    gap: 7px;
+  }
+  .quality-row > span {
+    grid-column: 1 / -1;
+  }
+  .quality-row i {
+    height: 18px;
+  }
+  .quality-comparison > small {
+    padding-left: 0;
   }
   .attention-row {
     grid-template-columns: 30px 1fr 14px;
