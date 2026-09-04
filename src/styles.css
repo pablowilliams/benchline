@@ -1,7 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
-
 :root {
-  font-family: "DM Sans", Inter, system-ui, sans-serif;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   color: #1a1d21;
   background: #efede7;
   font-synthesis: none;
@@ -19,6 +23,31 @@
   --violet: #6d43b5;
   --red: #b33b36;
   --sidebar: #191d21;
+}
+.quality-baseline {
+  fill: #98a1ad;
+}
+.quality-challenger {
+  fill: var(--blue);
+}
+.quality-chart text {
+  fill: var(--muted);
+  font-size: 12px;
+}
+.quiet-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.form-error,
+.inline-notice {
+  color: var(--red);
+  font-size: 13px;
+}
+.inline-notice {
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
 }
 * {
   box-sizing: border-box;

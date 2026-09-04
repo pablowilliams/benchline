@@ -1,9 +1,11 @@
 {
-  "requests": 20000,
-  "concurrency": 1,
-  "measured": "in-process deterministic serving path",
-  "p50_ms": 38.41,
-  "p95_ms": 42.81,
-  "p99_ms": 42.81,
+  "generated_at": "2026-09-04T18:27:40.214Z",
+  "requests": 5000,
+  "concurrency": 25,
+  "measured": "HTTP loopback through Fastify, validation, ranking and JSON serialization",
+  "p50_ms": 3.86,
+  "p95_ms": 8.34,
+  "p99_ms": 11.81,
+  "throughput_rps": 5048.9,
   "errors": 0
 }

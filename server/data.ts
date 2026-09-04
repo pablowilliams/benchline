@@ -224,7 +224,7 @@ export const users: UserProfile[] = [
 export const experiments = [
   {
     id: "exp_0248",
-    name: "Hybrid LTR / policy v3",
+    name: "Hybrid scorer / policy v3",
     status: "Ready for review",
     owner: "P. Williams",
     dataset: "temporal-2026-08",
@@ -233,7 +233,7 @@ export const experiments = [
     delta: 27.0,
     interval: "+24.3 to +29.9%",
     coverage: 100,
-    latency: 42.8,
+    latency: 0,
   },
   {
     id: "exp_0241",
@@ -267,20 +267,20 @@ export const models = [
   {
     version: "ranker-2.4.0",
     alias: "challenger",
-    family: "LambdaMART",
+    family: "Hybrid linear scorer",
     status: "Gates passed",
     trained: "2 Sep",
     features: "learning-v7",
-    hash: "9a7c…31e2",
+    hash: "source-defined",
   },
   {
     version: "ranker-2.3.2",
     alias: "champion",
-    family: "Gradient boosted",
+    family: "Hybrid linear scorer",
     status: "Serving",
     trained: "24 Aug",
     features: "learning-v6",
-    hash: "57bd…c911",
+    hash: "source-defined",
   },
   {
     version: "popular-1.3.0",
@@ -289,7 +289,7 @@ export const models = [
     status: "Serving fallback",
     trained: "Hourly",
     features: "catalog-v4",
-    hash: "16cc…78a0",
+    hash: "source-defined",
   },
 ];
 

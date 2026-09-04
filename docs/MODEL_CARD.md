@@ -26,7 +26,7 @@ The paired absolute NDCG delta is `+0.0660`; its user-level 95% bootstrap interv
 
 ## Limitations
 
-This repository implements an interpretable scoring analogue rather than a serialized LambdaMART binary. The synthetic evaluation favours well-estimated topic affinity and does not establish causal impact. Sensitive traits are neither generated nor used.
+This repository implements the hybrid linear scorer it describes; it does not claim to train or serialize a tree-based learning-to-rank model. The synthetic evaluation favours well-estimated topic affinity and does not establish causal impact. Sensitive traits are neither generated nor used.
 
 ## Rollback conditions
 

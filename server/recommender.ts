@@ -1,13 +1,19 @@
-import { createHash } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { RecommendationRequest, RecommendationResponse } from "../shared/contracts.js";
 import { courses, users } from "./data.js";
 
 const versions = { champion: "ranker-2.3.2", challenger: "ranker-2.4.0" } as const;
 
-export function recommend(input: RecommendationRequest): RecommendationResponse {
+export function recommend(
+  input: RecommendationRequest,
+  requestId = `req_${randomUUID()}`,
+): RecommendationResponse {
   const started = performance.now();
   const profile = users.find((user) => user.id === input.userId) ?? users.at(-1)!;
+  const featuresStarted = performance.now();
   const isCold = Object.keys(profile.topics).length === 0;
+  const featuresMs = performance.now() - featuresStarted;
+  const rankingStarted = performance.now();
   const ranked = courses
     .filter((course) => !profile.completed.includes(course.id))
     .map((course) => {
@@ -38,7 +44,9 @@ export function recommend(input: RecommendationRequest): RecommendationResponse 
       return { course, score, sources, reasons };
     })
     .sort((a, b) => b.score - a.score);
+  const rankingMs = performance.now() - rankingStarted;
 
+  const policyStarted = performance.now();
   const creatorCounts = new Map<string, number>();
   const reranked = ranked.map((entry, index) => ({
     ...entry,
@@ -56,16 +64,21 @@ export function recommend(input: RecommendationRequest): RecommendationResponse 
   });
   reranked.sort((a, b) => b.adjusted - a.adjusted);
   const selected = reranked.slice(0, input.limit);
+  const policyMs = performance.now() - policyStarted;
   const elapsed = performance.now() - started;
-  const requestId = `req_${createHash("sha1").update(JSON.stringify(input)).digest("hex").slice(0, 8)}`;
   return {
     requestId,
     generatedAt: new Date().toISOString(),
     modelVersion: versions[input.modelAlias],
     featureVersion: input.modelAlias === "challenger" ? "learning-v7" : "learning-v6",
     degraded: false,
-    latencyMs: Number((elapsed + 38.4).toFixed(1)),
-    stageTimings: { features: 7.8, retrieval: 11.6, ranking: 14.2, policy: 4.8 },
+    latencyMs: Number(elapsed.toFixed(3)),
+    stageTimings: {
+      features: Number(featuresMs.toFixed(3)),
+      retrieval: 0,
+      ranking: Number(rankingMs.toFixed(3)),
+      policy: Number(policyMs.toFixed(3)),
+    },
     recommendations: selected.map((entry, index) => ({
       itemId: entry.course.id,
       title: entry.course.title,

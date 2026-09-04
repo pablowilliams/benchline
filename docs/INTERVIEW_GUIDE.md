@@ -2,7 +2,7 @@
 
 ## 0:00 - Frame the problem
 
-Recommendation teams rarely fail because they cannot train a model. They fail at the joins between events, temporal features, evaluation, policy, releases and diagnosis. RankForge makes that evidence chain inspectable.
+Recommendation teams rarely fail because they cannot train a model. They fail at the joins between events, temporal features, evaluation, policy, releases and diagnosis. Benchline makes that evidence chain inspectable.
 
 ## 0:45 - Command Center
 
@@ -22,7 +22,7 @@ Trace dataset to feature set to experiment to bundle. Open promotion, show that 
 
 ## 5:15 - Feature Health and Delivery
 
-Inspect the watched creator-exposure feature and its downstream model. Then connect the 42.8 ms p95 to the trace waterfall and the 60 ms service objective.
+Inspect the watched creator-exposure feature and its downstream model. Then connect the committed loopback HTTP benchmark to the 60 ms development budget, while stating why it is not production telemetry.
 
 ## 6:15 - Code and evidence
 

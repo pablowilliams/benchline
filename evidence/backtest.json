@@ -1,5 +1,5 @@
 {
-  "title": "RankForge primary offline backtest",
+  "title": "Benchline primary offline backtest",
   "generated_on": "2026-09-04",
   "methodology": {
     "primary_metric": "NDCG@10",
@@ -20,7 +20,10 @@
     "items": 120,
     "train_events": 31680,
     "test_positives": 2880,
-    "split": "temporal holdout",
+    "split": "ordered synthetic temporal holdout",
+    "train_window": "2026-07-01/2026-08-20",
+    "test_window": "2026-08-21/2026-08-31",
+    "ordering": "train interactions are generated before unseen held-out positives",
     "topics": [
       "data-engineering",
       "machine-learning",
@@ -31,7 +34,7 @@
       "security",
       "systems"
     ],
-    "manifest_sha256": "142b47ef31c74c1cc40bb51c923867b8cb14a79afaee1903501e04b5c0134846"
+    "manifest_sha256": "27d98b1e345466775c684c00015530be37a6e24ac6bb5372858ea1d0e8eb9dba"
   },
   "baseline": {
     "ndcg_at_10": 0.2443080871064626,
@@ -53,7 +56,7 @@
     "interval_excludes_zero": true
   },
   "runtime": {
-    "seconds": 6.621990291998372,
+    "seconds": 4.2620767499975045,
     "python": "3.13.1",
     "platform": "macOS-14.6-arm64-arm-64bit-Mach-O"
   }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the signed 75-page RankForge plan and its readable Markdown source."""
+"""Build the signed 75-page Benchline plan and its readable Markdown source."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 
 from docs.plan_content import META, PAGES  # noqa: E402
 
-PDF_PATH = ROOT / "output" / "pdf" / "RankForge_75_Page_Engineering_Plan.pdf"
+PDF_PATH = ROOT / "output" / "pdf" / "Benchline_75_Page_Engineering_Plan.pdf"
 MARKDOWN_PATH = ROOT / "docs" / "ENGINEERING_PLAN.md"
 MANIFEST_PATH = ROOT / "docs" / "plan_manifest.json"
 
@@ -74,7 +74,7 @@ def draw_footer(canvas: Canvas, number: int, section: str) -> None:
     canvas.line(22 * mm, 16 * mm, width - 22 * mm, 16 * mm)
     canvas.setFillColor(MUTED)
     canvas.setFont(REGULAR, 7.5)
-    canvas.drawString(22 * mm, 10.5 * mm, f"RANKFORGE / {section.upper()}")
+    canvas.drawString(22 * mm, 10.5 * mm, f"BENCHLINE / {section.upper()}")
     canvas.setFont(BOLD, 8)
     canvas.drawRightString(width - 22 * mm, 10.5 * mm, f"{number:02d} / 75")
 
@@ -206,7 +206,7 @@ def write_markdown() -> None:
 def build_pdf() -> None:
     PDF_PATH.parent.mkdir(parents=True, exist_ok=True)
     canvas = Canvas(str(PDF_PATH), pagesize=A4, pageCompression=1)
-    canvas.setTitle("RankForge - 75-page engineering plan")
+    canvas.setTitle("Benchline - 75-page engineering plan")
     canvas.setAuthor(META["owner"])
     canvas.setSubject(META["subtitle"])
     for number, spec in enumerate(PAGES, 1):

@@ -1,6 +1,6 @@
 # Architecture
 
-RankForge separates the recommendation data plane from the operator control plane while keeping both runnable in one repository.
+Benchline separates the recommendation data plane from the operator control plane while keeping both runnable in one repository.
 
 ```mermaid
 flowchart LR
@@ -12,14 +12,14 @@ flowchart LR
   A --> S[Recommendation API]
   S --> X[Product surface]
   S --> O[Trace and metrics]
-  O --> W[RankForge control plane]
+  O --> W[Benchline control plane]
   T --> W
   R --> W
 ```
 
 ## Runtime path
 
-The current serving implementation resolves a user profile, blends content/collaborative and catalogue candidate signals, computes a bounded score, applies a creator-concentration penalty, and returns an evidence-bearing slate. The API validates inputs with Zod and returns stable request IDs derived from the request body for deterministic review.
+The current serving implementation resolves a user profile, blends content/collaborative and catalogue candidate signals, computes a bounded score, applies a creator-concentration penalty, and returns an evidence-bearing slate. The API validates inputs with Zod and returns a unique correlation ID for each request. Recommendation ordering remains deterministic for a fixed input.
 
 The default catalogue and profiles are local fixtures. Their interfaces are deliberately small so a database, online feature store, vector index, or registry adapter can replace them without changing the web application’s public contract.
 

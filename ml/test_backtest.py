@@ -15,6 +15,11 @@ class MetricTests(unittest.TestCase):
         self.assertEqual(first[2][0], second[2][0])
         self.assertEqual(first[3][10], second[3][10])
 
+    def test_holdout_contains_only_unseen_items(self):
+        _, users, train, test = backtest.generate_dataset()
+        for user_id, _ in users:
+            self.assertTrue(set(train[user_id]).isdisjoint(test[user_id]))
+
 
 if __name__ == "__main__":
     unittest.main()

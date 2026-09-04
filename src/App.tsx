@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   BarChart3,
-  Bell,
   Boxes,
   Check,
   CheckCircle2,
@@ -80,6 +79,31 @@ type Workspace = {
     coverage: number;
     p95: number;
     events: number;
+    creatorGini: number;
+    baselineCreatorGini: number;
+  };
+  scenario: string;
+  evidence: {
+    requests: number;
+    concurrency: number;
+    throughputRps: number;
+    p50: number;
+    p99: number;
+    scope: string;
+    generatedOn: string;
+    evaluationUsers: number;
+    bootstrapResamples: number;
+    baselineNdcg: number;
+    baselineRecall: number;
+    challengerRecall: number;
+    ciLow: number;
+    ciHigh: number;
+  };
+  releaseState: {
+    champion: string;
+    challenger: string;
+    storage: string;
+    audit: Array<{ id: string; action: string; from: string; to: string; note: string; at: string }>;
   };
 };
 
@@ -130,8 +154,8 @@ const nav: Array<{
 const pageMeta: Record<Page, { eyebrow: string; title: string; description: string }> = {
   overview: {
     eyebrow: "Operations / today",
-    title: "Recommendation systems, in one decision view",
-    description: "Quality, data and delivery evidence for the learning marketplace.",
+    title: "A working view of ranking quality and release risk",
+    description: "Reproducible evidence for a synthetic learning marketplace.",
   },
   explorer: {
     eyebrow: "Recommendation Explorer",
@@ -144,17 +168,17 @@ const pageMeta: Record<Page, { eyebrow: string; title: string; description: stri
     description: "Paired offline evaluation with uncertainty, slices and operational guardrails.",
   },
   registry: {
-    eyebrow: "Registry / learning-home",
+    eyebrow: "Demo registry / learning-home",
     title: "Ship a model you can reverse",
     description: "Immutable bundles, explicit aliases and release decisions with complete lineage.",
   },
   features: {
-    eyebrow: "Data plane / learning-v7",
+    eyebrow: "Feature scenario / learning-v7",
     title: "Find data risk before it becomes model risk",
     description: "Freshness, contract health and distribution change across active feature views.",
   },
   delivery: {
-    eyebrow: "Serving / eu-west",
+    eyebrow: "Local serving benchmark",
     title: "The path from request to ranked slate",
     description: "Measured latency, service objectives, trace stages and release history.",
   },
@@ -163,7 +187,7 @@ const pageMeta: Record<Page, { eyebrow: string; title: string; description: stri
 function useWorkspace() {
   const [data, setData] = useState<Workspace | null>(null);
   const [error, setError] = useState("");
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setError("");
     fetch("/api/v1/workspace")
       .then((r) => {
@@ -172,8 +196,8 @@ function useWorkspace() {
       })
       .then(setData)
       .catch((e) => setError(e.message));
-  };
-  useEffect(refresh, []);
+  }, []);
+  useEffect(refresh, [refresh]);
   return { data, error, refresh };
 }
 
@@ -184,8 +208,8 @@ function Logo() {
         <BarChart3 size={18} />
       </span>
       <span>
-        <b>RankForge</b>
-        <small>Recommendation operations</small>
+        <b>Benchline</b>
+        <small>Ranking workbench</small>
       </span>
     </div>
   );
@@ -243,8 +267,8 @@ function Sidebar({
           <div className="environment">
             <span className="pulse" />
             <span>
-              <b>Serving normally</b>
-              <small>eu-west / production</small>
+              <b>Demo service online</b>
+              <small>local / synthetic data</small>
             </span>
           </div>
           <div className="identity">
@@ -334,12 +358,12 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
       <section className="decision-strip">
         <div className="decision-copy">
           <span className="kicker">
-            <CheckCircle2 size={14} /> Release decision ready
+            <CheckCircle2 size={14} /> Evidence review complete
           </span>
-          <h2>Challenger 2.4.0 clears every production gate.</h2>
+          <h2>Challenger 2.4.0 passes the committed demo checks.</h2>
           <p>
-            Relevance improved without giving up catalogue coverage, creator balance or the 60 ms latency
-            budget.
+            Offline quality improved on the generated holdout, while coverage, creator balance and the local
+            HTTP latency budget remained inside their declared thresholds.
           </p>
         </div>
         <div className="decision-actions">
@@ -355,26 +379,26 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
         <Metric
           label="NDCG @ 10"
           value={ws.summary.ndcg.toFixed(4)}
-          delta={`+${ws.summary.uplift}%`}
+          delta={`+${ws.summary.uplift.toFixed(1)}%`}
           detail="vs contextual popularity"
         />
         <Metric
           label="Creator concentration"
-          value="0.094"
+          value={ws.summary.creatorGini.toFixed(3)}
           delta="−30.5%"
-          detail="Gini vs 0.136 baseline"
+          detail={`Gini vs ${ws.summary.baselineCreatorGini.toFixed(3)} baseline`}
           tone="teal"
         />
         <Metric
           label="Serving p95"
           value={`${ws.summary.p95} ms`}
-          delta="17.2 ms headroom"
-          detail="20k measured requests"
+          delta={`${Math.max(0, 60 - ws.summary.p95).toFixed(1)} ms headroom`}
+          detail={`${ws.evidence.requests.toLocaleString()} HTTP requests · c${ws.evidence.concurrency}`}
           tone="amber"
         />
         <Metric
           label="Training events"
-          value="31.68k"
+          value={`${(ws.summary.events / 1000).toFixed(2)}k`}
           delta="Deterministic"
           detail="locked evaluation window"
           tone="violet"
@@ -384,8 +408,8 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
         <article className="panel quality-panel">
           <div className="panel-head">
             <div>
-              <span className="section-label">Quality over time</span>
-              <h3>Observed NDCG @ 10</h3>
+              <span className="section-label">Locked holdout</span>
+              <h3>Measured NDCG @ 10</h3>
             </div>
             <div className="legend">
               <span>
@@ -398,10 +422,14 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
               </span>
             </div>
           </div>
-          <QualityChart />
+          <QualityChart
+            champion={ws.evidence.baselineNdcg}
+            challenger={ws.summary.ndcg}
+            users={ws.evidence.evaluationUsers}
+          />
           <div className="chart-note">
-            <span>Locked test window</span>
-            <b>Challenger remains above champion in 8/8 weekly cohorts</b>
+            <span>Paired user bootstrap</span>
+            <b>95% interval for the absolute delta excludes zero</b>
           </div>
         </article>
         <article className="panel attention">
@@ -410,9 +438,7 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
               <span className="section-label">Attention queue</span>
               <h3>Three things worth knowing</h3>
             </div>
-            <button className="text-btn">
-              View all <ChevronRight size={14} />
-            </button>
+            <span className="quiet-label">Scenario signals</span>
           </div>
           <div className="attention-list">
             <Attention
@@ -434,9 +460,9 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
             <Attention
               icon={GitBranch}
               tone="plain"
-              title="Rollback drill completed"
-              body="Previous champion restored in 46 seconds."
-              meta="Yesterday"
+              title="Rollback route available"
+              body="Promote the challenger, then restore the prior alias from Delivery."
+              meta="Demo workflow"
               onClick={() => setPage("delivery")}
             />
           </div>
@@ -447,17 +473,11 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
           <div className="panel-head">
             <div>
               <span className="section-label">Release gates</span>
-              <h3>5 of 5 passed</h3>
+              <h3>4 evidence checks passed</h3>
             </div>
             <span className="score-ring">100</span>
           </div>
-          {[
-            "Ranking quality",
-            "Coverage & diversity",
-            "Data contracts",
-            "Serving latency",
-            "Model integrity",
-          ].map((x) => (
+          {["Ranking quality", "Catalogue coverage", "Serving latency", "Artifact integrity"].map((x) => (
             <div className="gate-row" key={x}>
               <Check size={14} />
               <span>{x}</span>
@@ -534,40 +554,35 @@ function Attention({
   );
 }
 
-function QualityChart() {
-  const champion = [0.218, 0.222, 0.227, 0.231, 0.235, 0.238, 0.242, 0.244];
-  const challenger = [0.251, 0.259, 0.267, 0.275, 0.284, 0.293, 0.302, 0.31];
-  const map = (v: number) => 110 - ((v - 0.2) / 0.13) * 90;
+function QualityChart({
+  champion,
+  challenger,
+  users,
+}: {
+  champion: number;
+  challenger: number;
+  users: number;
+}) {
+  const scale = (value: number) => ((value - 0.2) / 0.14) * 420;
   return (
-    <svg
-      className="quality-chart"
-      viewBox="0 0 700 150"
-      role="img"
-      aria-label="Challenger quality trend remains above champion"
-    >
-      <g className="grid">
-        {[20, 50, 80, 110].map((y) => (
-          <line key={y} x1="45" x2="685" y1={y} y2={y} />
-        ))}
-      </g>
-      <g className="axis">
-        {["14 Jul", "21 Jul", "28 Jul", "04 Aug", "11 Aug", "18 Aug", "25 Aug", "01 Sep"].map((x, i) => (
-          <text x={45 + i * 91} y="140" key={x}>
-            {x}
-          </text>
-        ))}
-      </g>
-      <polyline
-        className="line champion-line"
-        points={champion.map((v, i) => `${45 + i * 91},${map(v)}`).join(" ")}
-      />
-      <polyline
-        className="line challenger-line"
-        points={challenger.map((v, i) => `${45 + i * 91},${map(v)}`).join(" ")}
-      />
-      {challenger.map((v, i) => (
-        <circle key={i} cx={45 + i * 91} cy={map(v)} r="3" className="point" />
-      ))}
+    <svg className="quality-chart" viewBox="0 0 700 150" role="img" aria-label="Measured NDCG comparison">
+      <text x="45" y="43">
+        Contextual popularity
+      </text>
+      <rect x="185" y="25" width={scale(champion)} height="25" rx="4" className="quality-baseline" />
+      <text x={195 + scale(champion)} y="43">
+        {champion.toFixed(4)}
+      </text>
+      <text x="45" y="98">
+        Hybrid scorer
+      </text>
+      <rect x="185" y="80" width={scale(challenger)} height="25" rx="4" className="quality-challenger" />
+      <text x={195 + scale(challenger)} y="98">
+        {challenger.toFixed(4)}
+      </text>
+      <text x="185" y="135">
+        Generated temporal holdout · {users} users
+      </text>
     </svg>
   );
 }
@@ -760,7 +775,10 @@ function Explorer({ ws }: { ws: Workspace }) {
             </div>
             <div className="evidence-footer">
               <code>{result!.requestId}</code>
-              <button className="text-btn">
+              <button
+                className="text-btn"
+                onClick={() => navigator.clipboard?.writeText(JSON.stringify(result, null, 2))}
+              >
                 Raw response <ExternalLink size={13} />
               </button>
             </div>
@@ -777,20 +795,22 @@ function Explorer({ ws }: { ws: Workspace }) {
   );
 }
 
-function Experiments({ ws }: { ws: Workspace }) {
+function Experiments({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }) {
   const [selected, setSelected] = useState(ws.experiments[0].id);
   const exp = ws.experiments.find((x) => x.id === selected)!;
   return (
     <div className="page-stack">
       <section className="evidence-banner">
         <div>
-          <Status tone="info">Paired bootstrap · 1,000 samples</Status>
+          <Status tone="info">
+            Paired bootstrap · {ws.evidence.bootstrapResamples.toLocaleString()} samples
+          </Status>
           <h2>{exp.name}</h2>
-          <p>Temporal holdout · 21–31 Aug 2026 · 720 evaluation users</p>
+          <p>Ordered synthetic holdout · {ws.evidence.evaluationUsers} evaluation users</p>
         </div>
-        <button className="button secondary">
+        <a className="button secondary" href="/api/v1/evidence" download="benchline-evidence.json">
           <FileText size={15} /> Export evidence
-        </button>
+        </a>
       </section>
       <section className="experiment-grid">
         <article className="panel run-list">
@@ -826,7 +846,7 @@ function Experiments({ ws }: { ws: Workspace }) {
               <h3>NDCG @ 10</h3>
             </div>
             <span className="big-delta">
-              <ArrowUpRight />+{exp.delta}%
+              <ArrowUpRight />+{exp.delta.toFixed(1)}%
             </span>
           </div>
           <div className="comparison-bars">
@@ -842,13 +862,13 @@ function Experiments({ ws }: { ws: Workspace }) {
               <i>
                 <u style={{ width: "64%" }} />
               </i>
-              <b>0.2443</b>
+              <b>{ws.evidence.baselineNdcg.toFixed(4)}</b>
             </div>
           </div>
           <div className="interval">
             <span>95% confidence interval</span>
             <b>{exp.interval}</b>
-            <small>Paired at the session level</small>
+            <small>Paired at the user level · absolute NDCG points</small>
           </div>
           <MiniLine values={[0.37, 0.381, 0.389, 0.397, 0.406, 0.412, 0.419, exp.ndcg]} />
         </article>
@@ -865,7 +885,7 @@ function Experiments({ ws }: { ws: Workspace }) {
             <b>Ready for controlled promotion</b>
             <p>All blocking thresholds passed. One non-blocking feature watch remains open.</p>
           </div>
-          <button className="button dark full">
+          <button className="button dark full" onClick={() => setPage("registry")}>
             Review release gates <ArrowRight size={15} />
           </button>
         </article>
@@ -876,9 +896,14 @@ function Experiments({ ws }: { ws: Workspace }) {
             <span className="section-label">Guardrails and slices</span>
             <h3>The average is not the whole story</h3>
           </div>
-          <button className="text-btn">
+          <a
+            className="text-btn"
+            href="https://github.com/pablowilliams/benchline/blob/main/docs/MODEL_CARD.md"
+            target="_blank"
+            rel="noreferrer"
+          >
             Metric definitions <ExternalLink size={13} />
-          </button>
+          </a>
         </div>
         <div className="data-table">
           <div className="table-head">
@@ -890,10 +915,28 @@ function Experiments({ ws }: { ws: Workspace }) {
           </div>
           {[
             ["Catalogue coverage", "100.0%", "98.3%", "+1.7 pts", "Passed"],
-            ["Recall @ 10", "0.2521", "0.2455", "+2.7%", "Passed"],
+            [
+              "Recall @ 10",
+              ws.evidence.challengerRecall.toFixed(4),
+              ws.evidence.baselineRecall.toFixed(4),
+              `+${((ws.evidence.challengerRecall / ws.evidence.baselineRecall - 1) * 100).toFixed(1)}%`,
+              "Passed",
+            ],
             ["Absolute NDCG delta", "+0.0660", "reference", "CI excludes 0", "Passed"],
-            ["Creator Gini", "0.0943", "0.1358", "−30.6%", "Passed"],
-            ["Serving p95", "42.8 ms", "8.4 ms", "+34.4 ms", "Passed"],
+            [
+              "Creator Gini",
+              ws.summary.creatorGini.toFixed(4),
+              ws.summary.baselineCreatorGini.toFixed(4),
+              `${((ws.summary.creatorGini / ws.summary.baselineCreatorGini - 1) * 100).toFixed(1)}%`,
+              "Passed",
+            ],
+            [
+              "HTTP p95",
+              `${ws.summary.p95} ms`,
+              "60 ms budget",
+              `${Math.max(0, 60 - ws.summary.p95).toFixed(1)} ms headroom`,
+              "Passed",
+            ],
           ].map((row) => (
             <div className="table-row" key={row[0]}>
               {row.map((c, i) => (
@@ -910,9 +953,33 @@ function Experiments({ ws }: { ws: Workspace }) {
   );
 }
 
-function Registry({ ws }: { ws: Workspace }) {
+function Registry({ ws, refresh }: { ws: Workspace; refresh: () => void }) {
   const [modal, setModal] = useState(false);
-  const [promoted, setPromoted] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [releaseError, setReleaseError] = useState("");
+  const promoted = ws.summary.champion === "ranker-2.4.0";
+  const promote = async (note: string) => {
+    setPending(true);
+    setReleaseError("");
+    const response = await fetch("/api/v1/releases/promote", {
+      method: "POST",
+      headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() },
+      body: JSON.stringify({
+        expectedChampion: ws.summary.champion,
+        challenger: ws.summary.challenger,
+        releaseNote: note,
+      }),
+    });
+    if (!response.ok) {
+      const body = await response.json();
+      setReleaseError(body.message ?? "Promotion failed");
+      setPending(false);
+      return;
+    }
+    setModal(false);
+    setPending(false);
+    refresh();
+  };
   return (
     <div className="page-stack">
       <section className="registry-hero">
@@ -924,12 +991,12 @@ function Registry({ ws }: { ws: Workspace }) {
           <ArrowRight />
           <span className="live">
             <small>Champion · 100% traffic</small>
-            <b>{promoted ? "ranker-2.4.0" : ws.summary.champion}</b>
+            <b>{ws.summary.champion}</b>
           </span>
           <ArrowRight />
           <span>
             <small>Challenger</small>
-            <b>{promoted ? ws.summary.champion : ws.summary.challenger}</b>
+            <b>{promoted ? "No pending candidate" : ws.summary.challenger}</b>
           </span>
         </div>
         <button className="button primary" onClick={() => setModal(true)} disabled={promoted}>
@@ -943,7 +1010,10 @@ function Registry({ ws }: { ws: Workspace }) {
             <span className="section-label">Deployable bundles</span>
             <h3>learning-home</h3>
           </div>
-          <button className="button secondary">
+          <button
+            className="button secondary"
+            onClick={() => document.querySelector(".lineage")?.scrollIntoView({ behavior: "smooth" })}
+          >
             <GitBranch size={15} /> Compare lineage
           </button>
         </div>
@@ -954,7 +1024,7 @@ function Registry({ ws }: { ws: Workspace }) {
             <span>Family</span>
             <span>Feature set</span>
             <span>Status</span>
-            <span>Artifact</span>
+            <span>Implementation</span>
           </div>
           {ws.models.map((m, i) => (
             <div className="model-row" key={m.version}>
@@ -994,7 +1064,7 @@ function Registry({ ws }: { ws: Workspace }) {
               <span>
                 <small>Dataset</small>
                 <b>temporal-2026-08</b>
-                <code>sha256 3f09…7b11</code>
+                <code>manifest hash in evidence</code>
               </span>
             </div>
             <i />
@@ -1012,7 +1082,7 @@ function Registry({ ws }: { ws: Workspace }) {
               <span>
                 <small>Experiment</small>
                 <b>exp_0248</b>
-                <code>commit 81e7ca2</code>
+                <code>reproducible benchmark</code>
               </span>
             </div>
             <i />
@@ -1021,7 +1091,7 @@ function Registry({ ws }: { ws: Workspace }) {
               <span>
                 <small>Bundle</small>
                 <b>ranker-2.4.0</b>
-                <code>signed · 18.4 MB</code>
+                <code>source-defined · no binary</code>
               </span>
             </div>
           </div>
@@ -1029,8 +1099,8 @@ function Registry({ ws }: { ws: Workspace }) {
         <article className="panel">
           <div className="panel-head">
             <div>
-              <span className="section-label">Release history</span>
-              <h3>Deliberate and reversible</h3>
+              <span className="section-label">Scenario history</span>
+              <h3>Illustrative release record</h3>
             </div>
           </div>
           <div className="release-list">
@@ -1064,17 +1134,35 @@ function Registry({ ws }: { ws: Workspace }) {
       {modal && (
         <PromotionModal
           onClose={() => setModal(false)}
-          onPromote={() => {
-            setPromoted(true);
-            setModal(false);
-          }}
+          onPromote={promote}
+          pending={pending}
+          error={releaseError}
+          p95={ws.summary.p95}
+          uplift={ws.summary.uplift}
+          coverage={ws.summary.coverage}
         />
       )}
     </div>
   );
 }
 
-function PromotionModal({ onClose, onPromote }: { onClose: () => void; onPromote: () => void }) {
+function PromotionModal({
+  onClose,
+  onPromote,
+  pending,
+  error,
+  p95,
+  uplift,
+  coverage,
+}: {
+  onClose: () => void;
+  onPromote: (note: string) => void;
+  pending: boolean;
+  error: string;
+  p95: number;
+  uplift: number;
+  coverage: number;
+}) {
   const [note, setNote] = useState("");
   return (
     <div className="modal-wrap" role="dialog" aria-modal="true" aria-labelledby="promote-title">
@@ -1090,11 +1178,16 @@ function PromotionModal({ onClose, onPromote }: { onClose: () => void; onPromote
         <span className="section-label">Controlled release</span>
         <h2 id="promote-title">Promote ranker-2.4.0?</h2>
         <p>
-          The alias will move after a warm-up health check. The current champion remains available for
-          one-click rollback.
+          This demo updates the server-side alias with an optimistic concurrency check. The state is held in
+          memory and resets when the process restarts.
         </p>
         <div className="gate-summary">
-          {["Quality +27.0%", "Coverage 100%", "p95 42.8 ms", "Artifact signed"].map((x) => (
+          {[
+            `Quality +${uplift.toFixed(1)}%`,
+            `Coverage ${coverage.toFixed(0)}%`,
+            `HTTP p95 ${p95} ms`,
+            "Source revision present",
+          ].map((x) => (
             <span key={x}>
               <Check />
               {x}
@@ -1109,12 +1202,21 @@ function PromotionModal({ onClose, onPromote }: { onClose: () => void; onPromote
             onChange={(e) => setNote(e.target.value)}
           />
         </label>
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="modal-actions">
           <button className="button secondary" onClick={onClose}>
             Cancel
           </button>
-          <button className="button primary" disabled={note.trim().length < 12} onClick={onPromote}>
-            Warm and promote <ArrowRight size={15} />
+          <button
+            className="button primary"
+            disabled={pending || note.trim().length < 12}
+            onClick={() => onPromote(note)}
+          >
+            {pending ? "Applying…" : "Promote alias"} <ArrowRight size={15} />
           </button>
         </div>
       </div>
@@ -1237,43 +1339,60 @@ function Features({ ws }: { ws: Workspace }) {
   );
 }
 
-function DeliveryPage() {
+function DeliveryPage({ ws, refresh }: { ws: Workspace; refresh: () => void }) {
+  const [rollbackState, setRollbackState] = useState("");
+  const rollback = async () => {
+    setRollbackState("Applying rollback…");
+    const response = await fetch("/api/v1/releases/rollback", {
+      method: "POST",
+      headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() },
+      body: JSON.stringify({
+        expectedChampion: ws.summary.champion,
+        releaseNote: "Operator-triggered rollback drill from the delivery view",
+      }),
+    });
+    const body = await response.json();
+    setRollbackState(
+      response.ok ? "Rollback applied to demo state" : (body.message ?? "Rollback was not applied"),
+    );
+    if (response.ok) refresh();
+  };
   return (
     <div className="page-stack">
       <section className="slo-band">
         <div>
-          <Status>Within objective</Status>
-          <h2>99.98% successful, complete recommendation slates</h2>
-          <p>Rolling 30-day target: 99.9% · 22% of monthly error budget consumed</p>
+          <Status>Benchmark passed</Status>
+          <h2>{ws.evidence.requests.toLocaleString()} HTTP requests completed without an error</h2>
+          <p>Local loopback benchmark · concurrency {ws.evidence.concurrency} · not production telemetry</p>
         </div>
         <div className="budget">
           <span>
-            <i style={{ width: "22%" }} />
+            <i style={{ width: "100%" }} />
           </span>
-          <b>78% budget remaining</b>
+          <b>{ws.evidence.throughputRps.toLocaleString()} requests/second</b>
         </div>
       </section>
       <section className="metrics-grid">
-        <Metric label="Availability" value="99.98%" delta="+0.08 pts" detail="30-day SLO" />
+        <Metric label="Benchmark success" value="100%" delta="0 errors" detail="single local run" />
         <Metric
           label="p95 latency"
-          value="42.8 ms"
-          delta="17.2 ms headroom"
-          detail="20k measured requests"
+          value={`${ws.summary.p95} ms`}
+          delta={`${Math.max(0, 60 - ws.summary.p95).toFixed(1)} ms headroom`}
+          detail={`${ws.evidence.requests.toLocaleString()} measured requests`}
           tone="teal"
         />
         <Metric
-          label="Slate completeness"
-          value="99.94%"
-          delta="+0.04 pts"
-          detail="minimum 8 items"
+          label="Median latency"
+          value={`${ws.evidence.p50} ms`}
+          delta="Measured"
+          detail="HTTP round trip"
           tone="amber"
         />
         <Metric
-          label="Feature freshness"
-          value="11 min"
-          delta="19 min headroom"
-          detail="online materialisation"
+          label="Tail latency"
+          value={`${ws.evidence.p99} ms`}
+          delta="Measured"
+          detail="99th percentile"
           tone="violet"
         />
       </section>
@@ -1281,66 +1400,66 @@ function DeliveryPage() {
         <article className="panel trace">
           <div className="panel-head">
             <div>
-              <span className="section-label">Representative trace</span>
-              <h3>req_81c2f1a0 · 42.8 ms</h3>
+              <span className="section-label">Request path · schematic</span>
+              <h3>What the benchmark exercises</h3>
             </div>
             <Status>200 OK</Status>
           </div>
           <div className="trace-bars">
             {[
-              ["Gateway", 42.8, 0],
-              ["Features", 7.8, 2],
-              ["Retrieval", 11.6, 10],
-              ["Ranking", 14.2, 22],
-              ["Policy", 4.8, 36],
-              ["Serialize", 4.2, 38],
+              ["HTTP + Fastify", 100, 0],
+              ["Validation", 18, 2],
+              ["Scoring", 43, 20],
+              ["Policy rerank", 24, 63],
+              ["JSON serialization", 11, 87],
             ].map(([n, w, l]) => (
               <div key={n as string}>
                 <span>{n}</span>
                 <i>
                   <u
                     style={{
-                      width: `${Number(w) * 1.9}%`,
-                      marginLeft: `${Number(l) * 1.6}%`,
+                      width: `${Number(w)}%`,
+                      marginLeft: `${Number(l)}%`,
                     }}
                   />
                 </i>
-                <b>{w} ms</b>
+                <b>{n === "HTTP + Fastify" ? `${ws.summary.p95} ms p95` : "included"}</b>
               </div>
             ))}
           </div>
           <div className="trace-foot">
-            <code>model.version=ranker-2.3.2</code>
-            <code>feature.set=learning-v6</code>
-            <code>fallback=false</code>
+            <code>model.version={ws.summary.champion}</code>
+            <code>measurement=loopback_http</code>
+            <code>errors=0</code>
           </div>
         </article>
         <article className="panel">
           <div className="panel-head">
             <div>
-              <span className="section-label">Latency distribution</span>
-              <h3>Comfortably inside 60 ms</h3>
+              <span className="section-label">Recorded percentiles</span>
+              <h3>Inside the 60 ms development budget</h3>
             </div>
             <span className="big-number">
-              42.8<small>p95 ms</small>
+              {ws.summary.p95}
+              <small>p95 ms</small>
             </span>
           </div>
           <LatencyHistogram />
           <div className="percentiles">
             <span>
-              <b>38.4</b>
+              <b>{ws.evidence.p50}</b>
               <small>p50</small>
             </span>
             <span>
-              <b>42.8</b>
+              <b>{ws.summary.p95}</b>
               <small>p95</small>
             </span>
             <span>
-              <b>51.8</b>
+              <b>{ws.evidence.p99}</b>
               <small>p99</small>
             </span>
             <span>
-              <b>0.02%</b>
+              <b>0</b>
               <small>errors</small>
             </span>
           </div>
@@ -1349,44 +1468,47 @@ function DeliveryPage() {
       <section className="panel">
         <div className="panel-head">
           <div>
-            <span className="section-label">Deployment history</span>
-            <h3>Changes against service behaviour</h3>
+            <span className="section-label">Demo release control</span>
+            <h3>Current process-local alias</h3>
           </div>
-          <button className="button secondary">
-            <RefreshCw size={14} /> Run rollback drill
+          <button
+            className="button secondary"
+            onClick={rollback}
+            disabled={
+              rollbackState === "Applying rollback…" ||
+              !ws.releaseState.audit.some((event) => event.action === "promote")
+            }
+            title={
+              ws.releaseState.audit.some((event) => event.action === "promote")
+                ? "Restore the prior alias"
+                : "Promote a challenger in this process first"
+            }
+          >
+            <RefreshCw size={14} /> Run demo rollback
           </button>
         </div>
         <div className="deploy-row">
           <div className="deploy-version">
             <span className="release-mark live" />
             <div>
-              <b>ranker-2.3.2</b>
-              <small>24 Aug, 14:32 · current champion</small>
+              <b>{ws.summary.champion}</b>
+              <small>Current in-memory champion</small>
             </div>
           </div>
           <span>
-            <ArrowDownRight /> −3.8 ms p95
+            <ArrowDownRight /> Alias state
           </span>
           <span>
-            <ArrowUpRight /> +2.1% NDCG
+            <ArrowUpRight /> {ws.releaseState.storage}
           </span>
-          <Status>Healthy</Status>
-        </div>
-        <div className="deploy-row">
-          <div className="deploy-version">
-            <span className="release-mark" />
-            <div>
-              <b>ranker-2.3.1</b>
-              <small>11 Aug, 09:18 · rolled back after 9 min</small>
-            </div>
-          </div>
-          <span className="negative">
-            <ArrowUpRight /> +31.4 ms p95
-          </span>
-          <span>Quality neutral</span>
-          <Status tone="neutral">Recovered in 46s</Status>
+          <Status>Active</Status>
         </div>
       </section>
+      {rollbackState && (
+        <div className="inline-notice" role="status">
+          {rollbackState}
+        </div>
+      )}
     </div>
   );
 }
@@ -1394,7 +1516,7 @@ function DeliveryPage() {
 function LatencyHistogram() {
   const bars = [12, 24, 38, 54, 72, 91, 100, 94, 79, 61, 44, 31, 20, 13, 8, 5];
   return (
-    <div className="histogram" aria-label="Latency distribution histogram">
+    <div className="histogram" aria-hidden="true">
       {bars.map((h, i) => (
         <i key={i} style={{ height: `${h}%` }} className={i > 11 ? "tail" : ""} />
       ))}
@@ -1461,7 +1583,7 @@ function CommandPalette({
           <span>
             <kbd>↵</kbd> open
           </span>
-          <span>RankForge command menu</span>
+          <span>Benchline command menu</span>
         </div>
       </div>
     </div>
@@ -1494,13 +1616,9 @@ function Header({
           <span>Search or jump to…</span>
           <kbd>⌘ K</kbd>
         </button>
-        <button className="icon-btn notification" aria-label="Notifications">
-          <Bell />
-          <i />
-        </button>
         <a
           className="icon-btn"
-          href="https://github.com/pablowilliams"
+          href="https://github.com/pablowilliams/benchline"
           target="_blank"
           aria-label="Open GitHub"
         >
@@ -1526,11 +1644,21 @@ function Skeleton() {
 }
 
 export default function App() {
-  const [page, setPage] = useState<Page>("overview");
+  const fromHash = () => {
+    const candidate = window.location.hash.slice(1) as Page;
+    return nav.some((item) => item.id === candidate) ? candidate : "overview";
+  };
+  const [page, setPageState] = useState<Page>(fromHash);
+  const setPage = useCallback((next: Page) => {
+    window.location.hash = next;
+    setPageState(next);
+  }, []);
   const [mobile, setMobile] = useState(false);
   const [command, setCommand] = useState(false);
   const { data, error, refresh } = useWorkspace();
   useEffect(() => {
+    const onHashChange = () => setPageState(fromHash());
+    window.addEventListener("hashchange", onHashChange);
     const listener = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -1539,7 +1667,10 @@ export default function App() {
       if (e.key === "Escape") setCommand(false);
     };
     window.addEventListener("keydown", listener);
-    return () => window.removeEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+      window.removeEventListener("hashchange", onHashChange);
+    };
   }, []);
   const content = useMemo(() => {
     if (!data) return null;
@@ -1549,15 +1680,15 @@ export default function App() {
       case "explorer":
         return <Explorer ws={data} />;
       case "experiments":
-        return <Experiments ws={data} />;
+        return <Experiments ws={data} setPage={setPage} />;
       case "registry":
-        return <Registry ws={data} />;
+        return <Registry ws={data} refresh={refresh} />;
       case "features":
         return <Features ws={data} />;
       case "delivery":
-        return <DeliveryPage />;
+        return <DeliveryPage ws={data} refresh={refresh} />;
     }
-  }, [data, page]);
+  }, [data, page, refresh, setPage]);
   return (
     <div className="app-shell">
       <a href="#main" className="skip-link">
@@ -1583,8 +1714,8 @@ export default function App() {
           )}
         </div>
         <footer className="app-footer">
-          <span>RankForge 1.0 · Synthetic learning marketplace</span>
-          <span>Every headline figure links to reproducible evidence.</span>
+          <span>Benchline 1.1 · Synthetic learning marketplace</span>
+          <span>Measured claims come from committed, reproducible evidence.</span>
         </footer>
       </main>
       <CommandPalette open={command} onClose={() => setCommand(false)} setPage={setPage} />

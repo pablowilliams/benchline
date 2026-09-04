@@ -37,3 +37,16 @@ export type RecommendationResponse = {
   recommendations: Recommendation[];
   stageTimings: { features: number; retrieval: number; ranking: number; policy: number };
 };
+
+export const PromotionRequest = z.object({
+  expectedChampion: z.string().min(1),
+  challenger: z.string().min(1),
+  releaseNote: z.string().trim().min(12).max(500),
+});
+export type PromotionRequest = z.infer<typeof PromotionRequest>;
+
+export const RollbackRequest = z.object({
+  expectedChampion: z.string().min(1),
+  releaseNote: z.string().trim().min(12).max(500),
+});
+export type RollbackRequest = z.infer<typeof RollbackRequest>;

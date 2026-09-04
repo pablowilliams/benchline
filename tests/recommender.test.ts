@@ -14,7 +14,8 @@ describe("recommendation contract", () => {
     expect(first.recommendations).toHaveLength(8);
     expect(new Set(first.recommendations.map((x) => x.itemId)).size).toBe(8);
     expect(first.recommendations.map((x) => x.itemId)).toEqual(second.recommendations.map((x) => x.itemId));
-    expect(first.requestId).toBe(second.requestId);
+    expect(first.requestId).not.toBe(second.requestId);
+    expect(first.requestId).toMatch(/^req_/);
     expect(first.recommendations.map((x) => x.rank)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
   it("supports cold start without degrading", () => {

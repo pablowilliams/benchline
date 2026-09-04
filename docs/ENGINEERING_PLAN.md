@@ -1,6 +1,6 @@
-# RankForge: 75-page engineering plan
+# Benchline: 75-page engineering plan
 
-A production recommendation and ranking control plane. Engineering plan / Edition 1, 04 September 2026.
+Recommendation evaluation and release workbench. Engineering plan / Edition 1, 04 September 2026.
 
 > The PDF is the signed page-stable edition. This Markdown source is provided for search, review, and pull-request discussion.
 
@@ -8,7 +8,7 @@ A production recommendation and ranking control plane. Engineering plan / Editio
 
 **Section:** Opening
 
-RankForge is an interview-grade product, not a dashboard wrapped around a notebook. It must show how a senior engineer turns ambiguous commercial goals into a dependable recommendation system that product, data, and operations teams can inspect and control.
+Benchline is an engineering workbench, not a dashboard wrapped around a notebook. It shows how ambiguous product goals become a recommendation system that product, data, and operations teams can inspect and control.
 
 ### Decisions
 
@@ -52,7 +52,7 @@ The plan is arranged as a build contract. Product intent comes first, system and
 
 **Section:** Strategy
 
-Most portfolio recommenders stop at model training. RankForge focuses on the expensive part: operating a multi-stage ranking product safely. It combines realistic offline evaluation with a control plane for exploration, comparison, release, and diagnosis.
+Most portfolio recommenders stop at model training. Benchline focuses on the expensive part: operating a multi-stage ranking product safely. It combines realistic offline evaluation with a control plane for exploration, comparison, release, and diagnosis.
 
 ### Decisions
 
@@ -74,7 +74,7 @@ Most portfolio recommenders stop at model training. RankForge focuses on the exp
 
 **Section:** Strategy
 
-Recommendation teams often split context across notebooks, registry screens, orchestration logs, and BI tools. RankForge compresses the release conversation into a single evidence chain while preserving links to underlying artifacts.
+Recommendation teams often split context across notebooks, registry screens, orchestration logs, and BI tools. Benchline compresses the release conversation into a single evidence chain while preserving links to underlying artifacts.
 
 ### Decisions
 
@@ -118,7 +118,7 @@ The application serves four users with different questions: the ML engineer impr
 
 **Section:** Strategy
 
-RankForge is useful when a team needs to understand recommendation behaviour, compare a challenger, approve a release, or investigate a quality regression. These jobs define the navigation and the API boundaries.
+Benchline is useful when a team needs to understand recommendation behaviour, compare a challenger, approve a release, or investigate a quality regression. These jobs define the navigation and the API boundaries.
 
 ### Decisions
 
@@ -188,7 +188,7 @@ Version one proves the control plane and evaluation discipline on a laptop. It d
 
 ### Decisions
 
-- Include deterministic synthetic marketplace data, baselines, hybrid retrieval, a learned ranker, policy re-ranking, and a measured API.
+- Include deterministic synthetic marketplace data, baselines, hybrid retrieval, an interpretable scorer, policy re-ranking, and a measured API.
 - Model distributed components through explicit interfaces and deployment manifests.
 - Exclude payment flows, real identity data, GPU training, and claims of live customer traffic.
 
@@ -228,7 +228,7 @@ The build must be impressive on a recruiter’s laptop: no cloud account, propri
 
 **Section:** Architecture
 
-RankForge sits between behavioural data producers, offline data systems, model development, and product serving. The web application is an operating surface over these contracts, not the system of record for raw events.
+Benchline sits between behavioural data producers, offline data systems, model development, and product serving. The web application is an operating surface over these contracts, not the system of record for raw events.
 
 ### Decisions
 
@@ -602,7 +602,7 @@ Cold start is not one case. New users, new items, anonymous sessions, sparse cat
 
 **Section:** Models
 
-Logged interactions reflect what prior models exposed, not unrestricted preference. RankForge must state this limitation and reduce obvious bias in training and evaluation.
+Logged interactions reflect what prior models exposed, not unrestricted preference. Benchline must state this limitation and reduce obvious bias in training and evaluation.
 
 ### Decisions
 
@@ -954,7 +954,7 @@ Delivery shows whether the recommendation path is meeting its operational contra
 
 **Section:** Experience
 
-RankForge should feel editorial and operational: warm off-white canvas, charcoal navigation, cobalt actions, compact typography, and diagrams that resemble engineering documents rather than neon AI concept art.
+Benchline should feel editorial and operational: warm off-white canvas, charcoal navigation, cobalt actions, compact typography, and diagrams that resemble engineering documents rather than neon AI concept art.
 
 ### Decisions
 
@@ -1108,7 +1108,7 @@ Traces explain time and decisions; logs record bounded events. Neither should be
 
 **Section:** Reliability
 
-Drift is diagnostic evidence, not proof of model failure. RankForge tracks feature distribution changes, prediction shifts, catalogue mix, and realised quality when labels arrive.
+Drift is diagnostic evidence, not proof of model failure. Benchline tracks feature distribution changes, prediction shifts, catalogue mix, and realised quality when labels arrive.
 
 ### Decisions
 
@@ -1328,7 +1328,7 @@ Evaluation uses a temporal split that mirrors the next-item decision. Training p
 
 **Section:** Evaluation
 
-Metric names are insufficient without semantics. RankForge calculates retrieval, ranking, coverage, diversity, novelty, concentration, calibration where relevant, and operational cost measures.
+Metric names are insufficient without semantics. Benchline calculates retrieval, ranking, coverage, diversity, novelty, concentration, calibration where relevant, and operational cost measures.
 
 ### Decisions
 

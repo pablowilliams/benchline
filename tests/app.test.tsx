@@ -15,7 +15,7 @@ const workspace = {
   experiments: [
     {
       id: "exp_1",
-      name: "Hybrid LTR",
+      name: "Hybrid scorer",
       status: "Ready for review",
       owner: "P",
       dataset: "temporal",
@@ -31,7 +31,7 @@ const workspace = {
     {
       version: "ranker-2.4.0",
       alias: "challenger",
-      family: "LambdaMART",
+      family: "Hybrid linear scorer",
       status: "Gates passed",
       trained: "2 Sep",
       features: "learning-v7",
@@ -57,10 +57,36 @@ const workspace = {
     coverage: 100,
     p95: 42.8,
     events: 31680,
+    creatorGini: 0.0943,
+    baselineCreatorGini: 0.1358,
+  },
+  scenario: "Synthetic learning marketplace",
+  evidence: {
+    requests: 5000,
+    concurrency: 25,
+    throughputRps: 5048.9,
+    p50: 3.86,
+    p99: 11.81,
+    scope: "Synthetic learning marketplace; offline association, not causal uplift.",
+    generatedOn: "2026-09-04",
+    evaluationUsers: 720,
+    bootstrapResamples: 1000,
+    baselineNdcg: 0.2443,
+    baselineRecall: 0.2455,
+    challengerRecall: 0.2521,
+    ciLow: 0.0594,
+    ciHigh: 0.0732,
+  },
+  releaseState: {
+    champion: "ranker-2.3.2",
+    challenger: "ranker-2.4.0",
+    storage: "in-memory demo store",
+    audit: [],
   },
 };
 
 beforeEach(() => {
+  window.history.replaceState(null, "", "#overview");
   vi.stubGlobal(
     "fetch",
     vi.fn(async () => ({ ok: true, json: async () => workspace })),
@@ -69,13 +95,13 @@ beforeEach(() => {
 describe("operator application", () => {
   it("loads the decision view and navigates to experiments", async () => {
     render(<App />);
-    expect(await screen.findByText("Challenger 2.4.0 clears every production gate.")).toBeInTheDocument();
+    expect(await screen.findByText("Challenger 2.4.0 passes the committed demo checks.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Review evidence/i }));
     expect(screen.getByRole("heading", { name: /Compare evidence/i })).toBeInTheDocument();
   });
   it("opens the command menu with the keyboard", async () => {
     render(<App />);
-    await screen.findByText("Challenger 2.4.0 clears every production gate.");
+    await screen.findByText("Challenger 2.4.0 passes the committed demo checks.");
     fireEvent.keyDown(window, { key: "k", metaKey: true });
     expect(screen.getByPlaceholderText(/Search pages/i)).toBeInTheDocument();
   });

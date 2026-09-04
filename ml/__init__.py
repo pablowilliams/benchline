@@ -1,1 +1,1 @@
-"""RankForge evaluation package."""
+"""Benchline evaluation package."""

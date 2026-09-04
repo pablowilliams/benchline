@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic temporal recommender backtest used by RankForge evidence."""
+"""Deterministic temporal recommender backtest used by Benchline evidence."""
 
 from __future__ import annotations
 
@@ -99,11 +99,6 @@ def generate_dataset():
     return items, users, train, test
 
 
-def popularity_ranking(items: list[Item], train: dict[int, list[int]]) -> list[int]:
-    counts = Counter(item for rows in train.values() for item in rows)
-    return sorted(range(len(items)), key=lambda item: (counts[item], items[item].quality), reverse=True)
-
-
 def contextual_popularity_ranking(user_id: int, items: list[Item], train: dict[int, list[int]]) -> list[int]:
     """A credible production baseline: dominant user topic plus global momentum."""
     global_counts = Counter(item for rows in train.values() for item in rows)
@@ -141,21 +136,17 @@ def hybrid_ranking(user_id: int, items: list[Item], train: dict[int, list[int]])
         if item.id in seen:
             score -= .18
         scored.append((score, item.id))
+    score_by_item = {item_id: score for score, item_id in scored}
     base = [item for _, item in sorted(scored, reverse=True)]
     # Greedy creator-aware rerank mirrors the serving policy.
     output, creator_count = [], Counter()
     pool = base[:35]
     while pool:
-        best = max(pool, key=lambda item: scored_lookup(scored, item) - creator_count[items[item].creator] * .055)
+        best = max(pool, key=lambda item: score_by_item[item] - creator_count[items[item].creator] * .055)
         output.append(best)
         creator_count[items[best].creator] += 1
         pool.remove(best)
     return output + base[35:]
-
-
-def scored_lookup(scored: list[tuple[float, int]], item_id: int) -> float:
-    return next(score for score, item in scored if item == item_id)
-
 
 def evaluate(rankings: dict[int, list[int]], test: dict[int, set[int]], items: list[Item]):
     users = sorted(test)
@@ -185,10 +176,21 @@ def main(output: Path):
     challenger, challenger_rows = evaluate(hybrid_rankings, test, items)
     interval = bootstrap_delta(challenger_rows, baseline_rows)
     uplift = (challenger["ndcg_at_10"] / baseline["ndcg_at_10"] - 1) * 100
-    dataset_manifest = {"seed": SEED, "users": N_USERS, "items": N_ITEMS, "train_events": sum(map(len, train.values())), "test_positives": sum(map(len, test.values())), "split":"temporal holdout", "topics":TOPICS}
+    dataset_manifest = {
+        "seed": SEED,
+        "users": N_USERS,
+        "items": N_ITEMS,
+        "train_events": sum(map(len, train.values())),
+        "test_positives": sum(map(len, test.values())),
+        "split": "ordered synthetic temporal holdout",
+        "train_window": "2026-07-01/2026-08-20",
+        "test_window": "2026-08-21/2026-08-31",
+        "ordering": "train interactions are generated before unseen held-out positives",
+        "topics": TOPICS,
+    }
     dataset_hash = hashlib.sha256(json.dumps(dataset_manifest, sort_keys=True).encode()).hexdigest()
     result = {
-        "title":"RankForge primary offline backtest",
+        "title":"Benchline primary offline backtest",
         "generated_on":str(date.today()),
         "methodology":{"primary_metric":"NDCG@10", "baseline":"contextual popularity", "challenger":"hybrid affinity + quality + policy rerank", "bootstrap":interval, "claim_scope":"Synthetic learning marketplace; offline association, not causal uplift."},
         "dataset":{**dataset_manifest, "manifest_sha256":dataset_hash},
