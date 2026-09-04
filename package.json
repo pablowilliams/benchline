@@ -17,7 +17,7 @@
     "benchmark": "python3 ml/backtest.py --output evidence/backtest.json",
     "loadtest": "tsx scripts/load-test.ts",
     "validate:evidence": "tsx scripts/validate-evidence.ts",
-    "validate": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run validate:evidence"
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm test && npm run validate:evidence"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
