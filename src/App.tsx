@@ -170,7 +170,7 @@ const pageMeta: Record<Page, { eyebrow: string; title: string; description: stri
     description: "Paired offline evaluation with uncertainty, slices and operational guardrails.",
   },
   registry: {
-    eyebrow: "Demo registry / learning-home",
+    eyebrow: "Model registry / learning-home",
     title: "Ship a model you can reverse",
     description: "Immutable bundles, explicit aliases and release decisions with complete lineage.",
   },
@@ -270,8 +270,8 @@ function Sidebar({
           <div className="environment">
             <span className="pulse" />
             <span>
-              <b>Demo service online</b>
-              <small>local / synthetic data</small>
+              <b>Workspace ready</b>
+              <small>Evaluation dataset</small>
             </span>
           </div>
           <div className="identity">
@@ -363,7 +363,7 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
           <span className="kicker">
             <CheckCircle2 size={14} /> Evidence review complete
           </span>
-          <h2>Challenger 2.4.0 passes the committed demo checks.</h2>
+          <h2>Challenger 2.4.0 passes the committed release checks.</h2>
           <p>
             Offline quality improved on the generated holdout, while coverage, creator balance and the local
             HTTP latency budget remained inside their declared thresholds.
@@ -465,7 +465,7 @@ function Overview({ ws, setPage }: { ws: Workspace; setPage: (p: Page) => void }
               tone="plain"
               title="Rollback route available"
               body="Promote the challenger, then restore the prior alias from Delivery."
-              meta="Demo workflow"
+              meta="Reversible change"
               onClick={() => setPage("delivery")}
             />
           </div>
@@ -1179,8 +1179,8 @@ function PromotionModal({
         <span className="section-label">Controlled release</span>
         <h2 id="promote-title">Promote ranker-2.4.0?</h2>
         <p>
-          This demo updates the server-side alias with an optimistic concurrency check. The state is held in
-          memory and resets when the process restarts.
+          This workspace updates the server-side alias with an optimistic concurrency check. The state is held
+          in memory and resets when the process restarts.
         </p>
         <div className="gate-summary">
           {[
@@ -1354,7 +1354,9 @@ function DeliveryPage({ ws, refresh }: { ws: Workspace; refresh: () => void }) {
     });
     const body = await response.json();
     setRollbackState(
-      response.ok ? "Rollback applied to demo state" : (body.message ?? "Rollback was not applied"),
+      response.ok
+        ? "Rollback applied to the current release state"
+        : (body.message ?? "Rollback was not applied"),
     );
     if (response.ok) refresh();
   };
@@ -1469,7 +1471,7 @@ function DeliveryPage({ ws, refresh }: { ws: Workspace; refresh: () => void }) {
       <section className="panel">
         <div className="panel-head">
           <div>
-            <span className="section-label">Demo release control</span>
+            <span className="section-label">Release control</span>
             <h3>Current process-local alias</h3>
           </div>
           <button
@@ -1485,7 +1487,7 @@ function DeliveryPage({ ws, refresh }: { ws: Workspace; refresh: () => void }) {
                 : "Promote a challenger in this process first"
             }
           >
-            <RefreshCw size={14} /> Run demo rollback
+            <RefreshCw size={14} /> Run rollback
           </button>
         </div>
         <div className="deploy-row">

@@ -80,7 +80,7 @@ const workspace = {
   releaseState: {
     champion: "ranker-2.3.2",
     challenger: "ranker-2.4.0",
-    storage: "in-memory demo store",
+    storage: "ephemeral release store",
     audit: [],
   },
 };
@@ -95,13 +95,15 @@ beforeEach(() => {
 describe("operator application", () => {
   it("loads the decision view and navigates to experiments", async () => {
     render(<App />);
-    expect(await screen.findByText("Challenger 2.4.0 passes the committed demo checks.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Challenger 2.4.0 passes the committed release checks."),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Review evidence/i }));
     expect(screen.getByRole("heading", { name: /Compare evidence/i })).toBeInTheDocument();
   });
   it("opens the command menu with the keyboard", async () => {
     render(<App />);
-    await screen.findByText("Challenger 2.4.0 passes the committed demo checks.");
+    await screen.findByText("Challenger 2.4.0 passes the committed release checks.");
     fireEvent.keyDown(window, { key: "k", metaKey: true });
     expect(screen.getByPlaceholderText(/Search pages/i)).toBeInTheDocument();
   });

@@ -20,7 +20,7 @@ export function createReleaseStore() {
   const snapshot = () => ({
     champion,
     challenger: seedModels.find((model) => model.alias === "challenger")?.version ?? "ranker-2.4.0",
-    storage: "in-memory demo store" as const,
+    storage: "ephemeral release store" as const,
     audit: [...audit],
   });
 
