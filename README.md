@@ -2,12 +2,14 @@
 
 Benchline is a small recommendation operations workbench for a fictional learning marketplace. It connects the work usually scattered across notebooks, registry screens, orchestration logs, and dashboards: inspect a slate, compare a candidate, review feature risk, apply a reversible alias change, and examine the serving path.
 
+**Live application:** [benchline-ranking-workbench.gjpw.chatgpt.site](https://benchline-ranking-workbench.gjpw.chatgpt.site)
+
 The product is intentionally honest. The dataset is deterministic and synthetic; quality metrics come from a reproducible temporal backtest; latency figures come from a declared local benchmark; the online experiment is designed as a simulation rather than presented as customer traffic.
 
 ## What is implemented
 
 - A three-stage recommendation path: hybrid candidates, learned-score analogue, and creator-aware policy re-ranking.
-- A typed Fastify API with boundary validation, unique correlation IDs, security headers, rate limiting, and production static serving.
+- A typed Fastify API for local/container deployment plus equivalent production route handlers, with boundary validation, correlation IDs, security headers, and rate limiting.
 - Six complete operator workflows: Command Center, Explorer, Experiments, Model Registry, Feature Health, and Delivery.
 - Warm-user and cold-start scenarios with per-item reasons, candidate provenance, ranking movement, and stage timings.
 - Deterministic temporal evaluation over 720 users, 120 items, 31,680 training events, and 2,880 held-out positives.

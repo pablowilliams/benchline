@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
@@ -1642,12 +1644,14 @@ function Skeleton() {
   );
 }
 
+function pageFromHash(): Page {
+  if (typeof window === "undefined") return "overview";
+  const candidate = window.location.hash.slice(1) as Page;
+  return nav.some((item) => item.id === candidate) ? candidate : "overview";
+}
+
 export default function App() {
-  const fromHash = () => {
-    const candidate = window.location.hash.slice(1) as Page;
-    return nav.some((item) => item.id === candidate) ? candidate : "overview";
-  };
-  const [page, setPageState] = useState<Page>(fromHash);
+  const [page, setPageState] = useState<Page>("overview");
   const setPage = useCallback((next: Page) => {
     window.location.hash = next;
     setPageState(next);
@@ -1656,7 +1660,8 @@ export default function App() {
   const [command, setCommand] = useState(false);
   const { data, error, refresh } = useWorkspace();
   useEffect(() => {
-    const onHashChange = () => setPageState(fromHash());
+    setPageState(pageFromHash());
+    const onHashChange = () => setPageState(pageFromHash());
     window.addEventListener("hashchange", onHashChange);
     const listener = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -1701,7 +1706,7 @@ export default function App() {
             <div className="error-state">
               <ServerCog />
               <h2>Workspace did not load</h2>
-              <p>{error}. Confirm the API is running on port 4100.</p>
+              <p>{error}. Refresh the workspace and try again.</p>
               <button className="button dark" onClick={refresh}>
                 Try again
               </button>

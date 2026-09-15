@@ -4,10 +4,11 @@
     "skipLibCheck": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "server", "scripts", "shared"]
+  "include": ["vite.config.ts", "vite.client.config.ts", "build", "server", "scripts", "shared", "worker"]
 }

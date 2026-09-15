@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import backtest from "../evidence/backtest.json" with { type: "json" };
+import loadtest from "../evidence/loadtest.json" with { type: "json" };
 
 export type BacktestEvidence = {
   generated_on: string;
@@ -40,13 +40,9 @@ export type LoadEvidence = {
   errors: number;
 };
 
-function readJson<T>(file: string): T {
-  return JSON.parse(readFileSync(join(process.cwd(), "evidence", file), "utf8")) as T;
-}
-
 export function readEvidence() {
   return {
-    backtest: readJson<BacktestEvidence>("backtest.json"),
-    load: readJson<LoadEvidence>("loadtest.json"),
+    backtest: backtest as BacktestEvidence,
+    load: loadtest as LoadEvidence,
   };
 }
